@@ -1,0 +1,61 @@
+HELP.md
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Spring Boot ###
+src/main/resources/application.*
+
+### Vue.js ###
+/src/main/js/moz-todo-vue/.DS_Store
+/src/main/js/moz-todo-vue/node_modules
+
+# local env files
+/src/main/js/moz-todo-vue/.env.local
+/src/main/js/moz-todo-vue/.env.*.local
+
+# Log files
+/src/main/js/moz-todo-vue/npm-debug.log*
+/src/main/js/moz-todo-vue/yarn-debug.log*
+/src/main/js/moz-todo-vue/yarn-error.log*
+/src/main/js/moz-todo-vue/pnpm-debug.log*
+
+# Editor directories and files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
