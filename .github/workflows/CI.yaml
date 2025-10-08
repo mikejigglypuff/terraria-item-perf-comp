@@ -13,5 +13,6 @@ jobs:
         with:
           distribution: 'oracle'
           java-version: '21'
-      - run: chmod +x gradlew | 
+      - run: |
+          chmod +x gradlew
           ./gradlew checkstyleMain --no-daemon
