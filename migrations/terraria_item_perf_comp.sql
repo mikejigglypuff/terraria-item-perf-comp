@@ -39,13 +39,15 @@ CREATE TABLE `items` (
 
 CREATE TABLE `titles` (
 	`id`	integer	NOT NULL,
-	`title`	varchar(255)	NOT NULL
+	`title`	varchar(255)	NOT NULL,
+	`img_url`   text    NULL
 );
 
 CREATE TABLE `item_category` (
 	`id`	integer	NOT NULL,
 	`category_name`	varchar(255)	NOT NULL,
-	`title_id`	integer	NOT NULL
+	`title_id`	integer	NOT NULL,
+	`img_url`   text    NULL
 );
 
 CREATE TABLE `item_balance_votes` (
@@ -61,7 +63,8 @@ CREATE TABLE `item_balance_votes` (
 CREATE TABLE `progressions` (
 	`id`	integer	NOT NULL,
 	`progress_name`	varchar(255)	NOT NULL,
-	`title_id`	integer	NOT NULL
+	`title_id`	integer	NOT NULL,
+	`img_url`   text    NULL
 );
 
 CREATE TABLE `item_comp_situations` (
