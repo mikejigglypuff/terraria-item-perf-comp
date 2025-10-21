@@ -65,7 +65,7 @@ CREATE TABLE `item_category` (
 
 CREATE TABLE `item_balance_votes` (
 	`id`	integer	PRIMARY KEY,
-	`choose_count`	smallint	NOT NULL    DEFAULT 0,
+	`choose_count`	integer	    NOT NULL    DEFAULT 0,
 	`created_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
 	`updated_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
 	`situation_id`	integer	NOT NULL,
@@ -106,6 +106,8 @@ CREATE TABLE `user_balance_stats` (
 ALTER TABLE `item_comp_votes`
   ADD CONSTRAINT `fk_item_comp_votes_situation`
   FOREIGN KEY (`situation_id`) REFERENCES `item_comp_situations`(`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `fk_item_comp_votes_user`
+  FOREIGN KEY (`user_id`) REFERENCES `item_comp_situations`(`id`) ON DELETE CASCADE;
 
 ALTER TABLE `comp_iteration_counts`
   ADD CONSTRAINT `fk_comp_iteration_counts_category`
@@ -128,6 +130,8 @@ ALTER TABLE `item_category`
   FOREIGN KEY (`title_id`) REFERENCES `titles`(`id`) ON DELETE CASCADE;
 
 ALTER TABLE `item_balance_votes`
+  ADD CONSTRAINT `fk_item_balance_votes_situation`
+  FOREIGN KEY (`situation_id`) REFERENCES `item_comp_situations`(`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_item_balance_votes_user`
   FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_item_balance_votes_chosen_item`
