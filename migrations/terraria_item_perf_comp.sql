@@ -1,7 +1,7 @@
 ﻿CREATE SCHEMA terraria_item_perf_comp;
 
 CREATE TABLE `item_comp_votes` (
-	`id`	integer	PRIMARY KEY,
+	`id`	integer AUTO_INCREMENT  PRIMARY KEY,
 	`comp_count`	smallint	NOT NULL    DEFAULT 0,
 	`created_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
 	`updated_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
@@ -13,13 +13,13 @@ CREATE TABLE `item_comp_votes` (
 );
 
 CREATE TABLE `comp_iteration_counts` (
-    `id`	integer	PRIMARY KEY,
+    `id`	integer	AUTO_INCREMENT  PRIMARY KEY,
     `category_id`	integer	NOT NULL,
     `iteration_count`   integer NOT NULL    DEFAULT 0
 );
 
 CREATE TABLE `users` (
-	`id`	integer	PRIMARY KEY,
+	`id`	integer	AUTO_INCREMENT  PRIMARY KEY,
 	`email`	varchar(255)	NULL,
 	`nickname`	varchar(15)	NULL,
 	`session_key`	varchar(255)	NULL,
@@ -37,12 +37,12 @@ CREATE TABLE `users` (
 );
 
 CREATE TABLE `user_roles` (
-    `id`	integer	PRIMARY KEY,
+    `id`	integer	AUTO_INCREMENT  PRIMARY KEY,
     `role_name` varchar(255)
 );
 
 CREATE TABLE `items` (
-	`id`	integer	PRIMARY KEY,
+	`id`	integer	AUTO_INCREMENT  PRIMARY KEY,
 	`item_name`	varchar(255)	NOT NULL,
 	`img_url`	text	NULL,
 	`min_progression_id`	integer	NOT NULL,
@@ -51,20 +51,20 @@ CREATE TABLE `items` (
 );
 
 CREATE TABLE `titles` (
-	`id`	integer	PRIMARY KEY,
+	`id`	integer	AUTO_INCREMENT  PRIMARY KEY,
 	`title`	varchar(255)	NOT NULL,
 	`img_url`   text    NULL
 );
 
 CREATE TABLE `item_category` (
-	`id`	integer	PRIMARY KEY,
+	`id`	integer	AUTO_INCREMENT  PRIMARY KEY,
 	`category_name`	varchar(255)	NOT NULL,
 	`title_id`	integer	NOT NULL,
 	`img_url`   text    NULL
 );
 
 CREATE TABLE `item_balance_votes` (
-	`id`	integer	PRIMARY KEY,
+	`id`	integer	AUTO_INCREMENT  PRIMARY KEY,
 	`choose_count`	integer	    NOT NULL    DEFAULT 0,
 	`created_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
 	`updated_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
@@ -74,14 +74,14 @@ CREATE TABLE `item_balance_votes` (
 );
 
 CREATE TABLE `progressions` (
-	`id`	integer	PRIMARY KEY,
+	`id`	integer	AUTO_INCREMENT  PRIMARY KEY,
 	`progress_name`	varchar(255)	NOT NULL,
 	`title_id`	integer	NOT NULL,
 	`img_url`   text    NULL
 );
 
 CREATE TABLE `item_comp_situations` (
-	`id`	integer	PRIMARY KEY,
+	`id`	integer	AUTO_INCREMENT  PRIMARY KEY,
 	`title_id`	integer	NOT NULL,
 	`progression_id`	integer	NOT NULL,
 	`category_id`	integer	NOT NULL,
@@ -97,7 +97,7 @@ CREATE TABLE `item_comp_stats` (
 );
 
 CREATE TABLE `user_balance_stats` (
-    `id` integer PRIMARY KEY,
+    `id` integer AUTO_INCREMENT  PRIMARY KEY,
     `user_id`   integer NOT NULL,
     `title_id`  integer NOT NULL,
     `correctness_rate`  DECIMAL(10, 3) NOT NULL DEFAULT 0
@@ -106,6 +106,7 @@ CREATE TABLE `user_balance_stats` (
 ALTER TABLE `item_comp_votes`
   ADD CONSTRAINT `fk_item_comp_votes_situation`
   FOREIGN KEY (`situation_id`) REFERENCES `item_comp_situations`(`id`) ON DELETE CASCADE;
+ALTER TABLE `item_comp_votes`
   ADD CONSTRAINT `fk_item_comp_votes_user`
   FOREIGN KEY (`user_id`) REFERENCES `item_comp_situations`(`id`) ON DELETE CASCADE;
 
