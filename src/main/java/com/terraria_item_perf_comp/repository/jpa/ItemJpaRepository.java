@@ -5,11 +5,15 @@ import com.terraria_item_perf_comp.repository.projections.ItemPair;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
+import com.terraria_item_perf_comp.repository.ItemRepository;
 import java.util.List;
 
-public interface ItemJpaRepository extends JpaRepository<Item, Integer> {
+@Repository
+public interface ItemJpaRepository extends JpaRepository<Item, Integer>, ItemRepository {
 
+    @Override
     @Query(value = "WITH candidate_pairs AS (\n" +
             "  SELECT\n" +
             "      i1.id AS item1_id,\n" +
