@@ -34,4 +34,8 @@ public class UserBalanceStat {
     @ColumnDefault("0")
     @Column(name = "correctness_rate", precision = 10, scale = 3)
     private BigDecimal correctnessRate;
+
+    public void updateCorrectnessRate(BigDecimal correctnessRate) {
+        this.correctnessRate = correctnessRate;
+    }
 }

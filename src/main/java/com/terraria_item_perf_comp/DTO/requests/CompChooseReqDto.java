@@ -4,6 +4,8 @@ public record CompChooseReqDto(
         int titleId,
         int categoryId,
         int chosenId,
+        int notChosenId,
+        int progressionId,
         String chooseReason
 ) {
 }
