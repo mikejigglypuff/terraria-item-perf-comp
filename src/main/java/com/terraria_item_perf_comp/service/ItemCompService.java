@@ -1,24 +1,32 @@
 package com.terraria_item_perf_comp.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.terraria_item_perf_comp.repository.ItemBalanceVoteRepository;
 import com.terraria_item_perf_comp.repository.ItemCompSituationRepository;
 import com.terraria_item_perf_comp.repository.ItemCompVoteRepository;
 
 @Service
 public class ItemCompService {
 
+    private static final int DEFAULT_USER_ID = 0;
+
     private final ItemCompSituationRepository itemCompSituationRepository;
     private final ItemCompVoteRepository itemCompVoteRepository;
+    private final ItemBalanceVoteRepository itemBalanceVoteRepository;
 
     public ItemCompService(
             ItemCompSituationRepository itemCompSituationRepository,
-            ItemCompVoteRepository itemCompVoteRepository
+            ItemCompVoteRepository itemCompVoteRepository,
+            ItemBalanceVoteRepository itemBalanceVoteRepository
     ) {
         this.itemCompSituationRepository = itemCompSituationRepository;
         this.itemCompVoteRepository = itemCompVoteRepository;
+        this.itemBalanceVoteRepository = itemBalanceVoteRepository;
     }
 
     public void processCompChoice(
@@ -31,41 +39,133 @@ public class ItemCompService {
             int item2Id,
             String chosenReason
     ) {
-        // compItem1, compItem2는 item1Id, item2Id로 결정
-        int compItem1 = item1Id;
-        int compItem2 = item2Id;
-
-        // 조합 존재 여부 확인 (comp_item_min, comp_item_max 기준)
-        Optional<Integer> situationIdOpt = itemCompSituationRepository.findSituationId(
-                titleId, progressionId, categoryId, compItem1, compItem2
+        int situationId = ensureSituationId(
+                titleId,
+                progressionId,
+                categoryId,
+                item1Id,
+                item2Id,
+                chosenItemId,
+                otherItemId
         );
 
-        if (situationIdOpt.isEmpty()) {
-            // 조합이 없으면 insertByIds 수행
-            // chosenId와 notChosenId는 chosenItemId와 otherItemId 사용
-            int chosenId = chosenItemId;
-            int notChosenId = otherItemId;
-            
-            itemCompSituationRepository.insertByIds(
-                    titleId, progressionId, categoryId, chosenId, notChosenId
-            );
-        } else {
-            // 조합이 있으면 upsertVote 수행
-            int situationId = situationIdOpt.get();
-            // userId와 compCount는 파라미터에 없으므로 기본값 사용
-            // TODO: userId는 실제 사용자 ID를 받아야 할 수 있음
-            int userId = 0; // 기본값, 필요시 파라미터로 받도록 수정 필요
-            int voteCount = 1; // 기본값
-            short compCount = 1; // 기본값
+        int userId = DEFAULT_USER_ID;
+        int voteCount = 1;
+        short compCount = 1;
 
-            itemCompVoteRepository.upsertVote(
-                    situationId,
-                    userId,
-                    chosenItemId,
-                    voteCount,
-                    compCount,
-                    chosenReason
-            );
+        itemCompVoteRepository.upsertVote(
+                situationId,
+                userId,
+                chosenItemId,
+                voteCount,
+                compCount,
+                chosenReason
+        );
+    }
+
+    public List<ItemSelectionRate> recordBalanceVoteAndGetRates(
+            int titleId,
+            int categoryId,
+            int progressionId,
+            int chosenItemId,
+            int notChosenId,
+            int item1Id,
+            int item2Id
+    ) {
+        int situationId = ensureSituationId(
+                titleId,
+                progressionId,
+                categoryId,
+                item1Id,
+                item2Id,
+                chosenItemId,
+                notChosenId
+        );
+
+        itemBalanceVoteRepository.upsertBalanceVote(situationId, DEFAULT_USER_ID, chosenItemId);
+
+        Double chosenRateValue = itemBalanceVoteRepository.findSelectionRate(
+                situationId,
+                DEFAULT_USER_ID,
+                chosenItemId
+        );
+        double chosenRate = clampRate(chosenRateValue);
+        double otherRate = clampRate(1.0 - chosenRate);
+
+        List<ItemSelectionRate> rates = new ArrayList<>(2);
+        rates.add(new ItemSelectionRate(chosenItemId, chosenRate));
+        rates.add(new ItemSelectionRate(notChosenId, otherRate));
+        return rates;
+    }
+
+    private double clampRate(Double value) {
+        if (value == null) {
+            return 0.0;
+        }
+        if (value < 0.0) {
+            return 0.0;
+        }
+        if (value > 1.0) {
+            return 1.0;
+        }
+        return value;
+    }
+
+    private int ensureSituationId(
+            int titleId,
+            int progressionId,
+            int categoryId,
+            int item1Id,
+            int item2Id,
+            int chosenItemId,
+            int notChosenId
+    ) {
+        Optional<Integer> situationIdOpt = itemCompSituationRepository.findSituationId(
+                titleId,
+                progressionId,
+                categoryId,
+                item1Id,
+                item2Id
+        );
+        if (situationIdOpt.isPresent()) {
+            return situationIdOpt.get();
+        }
+
+        itemCompSituationRepository.insertByIds(
+                titleId,
+                progressionId,
+                categoryId,
+                chosenItemId,
+                notChosenId
+        );
+
+        return itemCompSituationRepository.findSituationId(
+                titleId,
+                progressionId,
+                categoryId,
+                item1Id,
+                item2Id
+        ).orElseThrow(() ->
+                new IllegalStateException("Failed to create item_comp_situations entry for items %d / %d"
+                        .formatted(item1Id, item2Id))
+        );
+    }
+
+    public static class ItemSelectionRate {
+        private final int itemId;
+        private final double selectionRate;
+
+        public ItemSelectionRate(int itemId, double selectionRate) {
+            this.itemId = itemId;
+            this.selectionRate = selectionRate;
+        }
+
+        public int getItemId() {
+            return itemId;
+        }
+
+        public double getSelectionRate() {
+            return selectionRate;
         }
     }
 }
