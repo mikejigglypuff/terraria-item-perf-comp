@@ -52,7 +52,7 @@ public class GameController {
   @GetMapping("/titles/{titleId}/categories")
   public ResponseEntity<ItemCategoryResDto> getGameCategories(@PathVariable int titleId) {
     // TODO: Implement get game categories logic
-    return ResponseEntity.ok(new ItemCategoryResDto("success", new ItemCategory[0]));
+    return ResponseEntity.ok(new ItemCategoryResDto("success", new ArrayList<>()));
   }
 
   @GetMapping("/start")
@@ -71,6 +71,6 @@ public class GameController {
   @PostMapping("/balance/choose")
   public ResponseEntity<BalanceChooseResDto> balanceChoose(@RequestBody BalanceChooseReqDto gameBalanceChooseReqDto) {
     // TODO: Implement balance choose logic
-    return ResponseEntity.ok(new BalanceChooseResDto("success", 0, 0, new String[0], new String[0]));
+    return ResponseEntity.ok(new BalanceChooseResDto("success", 0, 0, new ArrayList<>(), new ArrayList<>()));
   }
 }
