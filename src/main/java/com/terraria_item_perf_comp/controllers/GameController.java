@@ -33,6 +33,7 @@ import com.terraria_item_perf_comp.service.ItemService;
 import com.terraria_item_perf_comp.service.ItemCategoryService;
 import com.terraria_item_perf_comp.service.ItemCompService;
 import com.terraria_item_perf_comp.service.TitleService;
+import com.terraira_item_perf_comp.service.ProgressionService;
 
 @RestController
 @RequestMapping("/api/game")
@@ -43,6 +44,7 @@ public class GameController {
   private final ItemService itemService;
   private final ItemCompService itemCompService;
   private final ItemStatService itemStatService;
+  private final com.terraria_item_perf_comp.service.ProgressionService progressionService;
 
   @GetMapping("/titles")
   public ResponseEntity<GameTitleResDto> getGameTitles() {
@@ -51,20 +53,21 @@ public class GameController {
 
   @GetMapping("/titles/{titleId}/categories")
   public ResponseEntity<ItemCategoryResDto> getGameCategories(@PathVariable int titleId) {
-    // TODO: Implement get game categories logic
-    return ResponseEntity.ok(new ItemCategoryResDto("success", new ArrayList<>()));
+    return ResponseEntity.ok(new ItemCategoryResDto("success", itemCategoryService.getItemCategoriesByTitleId(titleId)));
   }
 
   @GetMapping("/start")
   public ResponseEntity<GameStartResDto> startGame(@RequestBody GameStartReqDto gameStartReqDto) {
-    // TODO: Implement start game logic
+    int progressionId = progressionService.getRandomProgressionId();
     return ResponseEntity.ok(new GameStartResDto(
-      "success", new Progression(), new Item(), new Item()));
+      "success", new Progression(), itemService.getUnseenItemPairs(gameStartReqDto.titleId(), gameStartReqDto.categoryId(), progressionId)));
   }
 
   @PostMapping("/comp/choose")
   public ResponseEntity<String> compChoose(@RequestBody CompChooseReqDto gameCompChooseReqDto) {
-    // TODO: Implement comp choose logic
+    itemCompService.processCompChoice(
+      gameCompChooseReqDto.categoryId(), gameCompChooseReqDto.chosenId(), gameCompChooseReqDto.titleId(), gameCompChooseReqDto.progressionId(), 
+      gameCompChooseReqDto.notChosenId(), gameCompChooseReqDto.item1Id(), gameCompChooseReqDto.item2Id(), gameCompChooseReqDto.chooseReason());
     return ResponseEntity.ok("success");
   }
 
