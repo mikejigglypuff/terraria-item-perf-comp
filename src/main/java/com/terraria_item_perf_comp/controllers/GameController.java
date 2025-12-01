@@ -73,7 +73,15 @@ public class GameController {
 
   @PostMapping("/balance/choose")
   public ResponseEntity<BalanceChooseResDto> balanceChoose(@RequestBody BalanceChooseReqDto gameBalanceChooseReqDto) {
-    // TODO: Implement balance choose logic
-    return ResponseEntity.ok(new BalanceChooseResDto("success", 0, 0, new ArrayList<>(), new ArrayList<>()));
+    BalanceChooseResDto response = itemCompService.processBalanceChoiceAndGetResponse(
+      gameBalanceChooseReqDto.titleId(),
+      gameBalanceChooseReqDto.categoryId(),
+      gameBalanceChooseReqDto.progressionId(),
+      gameBalanceChooseReqDto.chosenId(),
+      gameBalanceChooseReqDto.notChosenId(),
+      gameBalanceChooseReqDto.chosenId(),
+      gameBalanceChooseReqDto.notChosenId()
+    );
+    return ResponseEntity.ok(response);
   }
 }

@@ -6,6 +6,8 @@ import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
+import com.terraria_item_perf_comp.DTO.responses.BalanceChooseResDto;
+import com.terraria_item_perf_comp.DTO.responses.VO.ItemSelectionRate;
 import com.terraria_item_perf_comp.repository.ItemBalanceVoteRepository;
 import com.terraria_item_perf_comp.repository.ItemCompSituationRepository;
 import com.terraria_item_perf_comp.repository.ItemCompVoteRepository;
@@ -98,6 +100,40 @@ public class ItemCompService {
         return rates;
     }
 
+    public BalanceChooseResDto processBalanceChoiceAndGetResponse(
+            int titleId,
+            int categoryId,
+            int progressionId,
+            int chosenItemId,
+            int notChosenId,
+            int item1Id,
+            int item2Id
+    ) {
+        List<ItemSelectionRate> itemSelectionRates = recordBalanceVoteAndGetRates(
+                titleId,
+                categoryId,
+                progressionId,
+                chosenItemId,
+                notChosenId,
+                item1Id,
+                item2Id
+        );
+
+        // itemSelectionRates에서 첫 번째가 item1, 두 번째가 item2
+        int item1IdFromRates = itemSelectionRates.get(0).itemId();
+        int item2IdFromRates = itemSelectionRates.get(1).itemId();
+
+        List<String> item1Reasons = itemCompVoteRepository.findTop5ReasonsByItemIdOrderByCreatedAtDesc(item1IdFromRates);
+        List<String> item2Reasons = itemCompVoteRepository.findTop5ReasonsByItemIdOrderByCreatedAtDesc(item2IdFromRates);
+
+        return new BalanceChooseResDto(
+                "success",
+                itemSelectionRates,
+                item1Reasons,
+                item2Reasons
+        );
+    }
+
     private double clampRate(Double value) {
         if (value == null) {
             return 0.0;
@@ -149,24 +185,6 @@ public class ItemCompService {
                 new IllegalStateException("Failed to create item_comp_situations entry for items %d / %d"
                         .formatted(item1Id, item2Id))
         );
-    }
-
-    public static class ItemSelectionRate {
-        private final int itemId;
-        private final double selectionRate;
-
-        public ItemSelectionRate(int itemId, double selectionRate) {
-            this.itemId = itemId;
-            this.selectionRate = selectionRate;
-        }
-
-        public int getItemId() {
-            return itemId;
-        }
-
-        public double getSelectionRate() {
-            return selectionRate;
-        }
     }
 }
 

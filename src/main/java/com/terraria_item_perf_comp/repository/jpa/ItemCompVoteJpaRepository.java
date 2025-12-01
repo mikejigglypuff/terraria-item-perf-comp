@@ -9,6 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Repository
 public interface ItemCompVoteJpaRepository extends CrudRepository<ItemCompVote, Integer>, ItemCompVoteRepository {
 
@@ -30,6 +32,13 @@ public interface ItemCompVoteJpaRepository extends CrudRepository<ItemCompVote, 
           @Param("compCount") short compCount,
           @Param("chooseReason") String chooseReason
   );
+
+  @Override
+  @Query(value = "SELECT choose_reason FROM item_comp_votes " +
+          "WHERE chosen_item_id = :itemId AND choose_reason IS NOT NULL " +
+          "ORDER BY created_at DESC LIMIT 5",
+          nativeQuery = true)
+  List<String> findTop5ReasonsByItemIdOrderByCreatedAtDesc(@Param("itemId") int itemId);
     
 }
 
