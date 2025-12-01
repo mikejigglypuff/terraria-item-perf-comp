@@ -1,7 +1,7 @@
 package com.terraria_item_perf_comp.repository.jpa;
 
-import com.terraria_item_perf_comp.models.ItemCompVote;
-import com.terraria_item_perf_comp.repository.ItemCompVoteRepository;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -9,7 +9,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import com.terraria_item_perf_comp.models.ItemCompVote;
+import com.terraria_item_perf_comp.repository.ItemCompVoteRepository;
 
 @Repository
 public interface ItemCompVoteJpaRepository extends CrudRepository<ItemCompVote, Integer>, ItemCompVoteRepository {

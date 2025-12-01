@@ -10,7 +10,7 @@ import com.terraria_item_perf_comp.models.Progression;
 import com.terraria_item_perf_comp.repository.ProgressionRepository;
 
 @Repository
-public interface ProgressionJpaRepository extends JpaRepository<Progression, Integer>, ProgressionRepository {
+public interface ProgressionJpaRepository extends ProgressionRepository {
 
     @Override
     @Query("SELECT MAX(p.id) FROM Progression p")

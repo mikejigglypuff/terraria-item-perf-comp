@@ -2,6 +2,7 @@ package com.terraria_item_perf_comp.controllers;
 
 import java.util.*;
 
+import com.terraria_item_perf_comp.service.*;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,13 +29,6 @@ import com.terraria_item_perf_comp.DTO.responses.BalanceChooseResDto;
 
 import org.springframework.web.bind.annotation.GetMapping;
 
-import com.terraria_item_perf_comp.service.ItemStatService;
-import com.terraria_item_perf_comp.service.ItemService;
-import com.terraria_item_perf_comp.service.ItemCategoryService;
-import com.terraria_item_perf_comp.service.ItemCompService;
-import com.terraria_item_perf_comp.service.TitleService;
-import com.terraira_item_perf_comp.service.ProgressionService;
-
 @RestController
 @RequestMapping("/api/game")
 @RequiredArgsConstructor
@@ -44,7 +38,7 @@ public class GameController {
   private final ItemService itemService;
   private final ItemCompService itemCompService;
   private final ItemStatService itemStatService;
-  private final com.terraria_item_perf_comp.service.ProgressionService progressionService;
+  private final ProgressionService progressionService;
 
   @GetMapping("/titles")
   public ResponseEntity<GameTitleResDto> getGameTitles() {
@@ -58,7 +52,7 @@ public class GameController {
 
   @GetMapping("/start")
   public ResponseEntity<GameStartResDto> startGame(@RequestBody GameStartReqDto gameStartReqDto) {
-    int progressionId = progressionService.getRandomProgressionId();
+    int progressionId = progressionService.getRandomIdProgression().getId();
     return ResponseEntity.ok(new GameStartResDto(
       "success", new Progression(), itemService.getUnseenItemPairs(gameStartReqDto.titleId(), gameStartReqDto.categoryId(), progressionId)));
   }
