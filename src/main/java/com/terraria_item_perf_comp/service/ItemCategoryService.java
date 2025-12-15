@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.terraria_item_perf_comp.DTO.responses.ItemCategoryDto;
 import com.terraria_item_perf_comp.models.ItemCategory;
 import com.terraria_item_perf_comp.repository.ItemCategoryRepository;
 
@@ -16,8 +17,18 @@ public class ItemCategoryService {
         this.itemCategoryRepository = itemCategoryRepository;
     }
 
-    public List<ItemCategory> getItemCategoriesByTitleId(int titleId) {
-        return itemCategoryRepository.findByTitleId(titleId);
+    public List<ItemCategoryDto> getItemCategoriesByTitleId(int titleId) {
+        List<ItemCategory> categories = itemCategoryRepository.findByTitleId(titleId);
+
+        return categories.stream()
+                .map(category -> new ItemCategoryDto(
+                        category.getId(),
+                        category.getCategoryName(),
+                        category.getTitle().getId(),
+                        category.getTitle().getTitle(),
+                        category.getImgUrl()
+                ))
+                .toList();
     }
 }
 

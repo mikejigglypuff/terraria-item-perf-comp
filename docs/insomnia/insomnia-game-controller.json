@@ -1,0 +1,221 @@
+{
+  "_type": "export",
+  "__export_format": 4,
+  "__export_date": "2024-01-01T00:00:00.000Z",
+  "__export_source": "insomnia.desktop.app:v2023.5.8",
+  "resources": [
+    {
+      "_id": "wrk_game_api",
+      "_type": "workspace",
+      "parentId": null,
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "Game API Workspace",
+      "description": "GameController API workspace",
+      "scope": "collection"
+    },
+    {
+      "_id": "req_get_titles",
+      "_type": "request",
+      "parentId": "fld_game_api",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/game/titles",
+      "name": "Get Game Titles",
+      "description": "게임 타이틀 목록을 가져옵니다.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_content_type"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 1000000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_get_categories",
+      "_type": "request",
+      "parentId": "fld_game_api",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/game/titles/{{ _.title_id }}/categories",
+      "name": "Get Categories by Title",
+      "description": "특정 타이틀의 카테고리 목록을 가져옵니다.",
+      "method": "GET",
+      "body": {},
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_content_type"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 2000000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_start_game",
+      "_type": "request",
+      "parentId": "fld_game_api",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/game/start",
+      "name": "Start Game",
+      "description": "게임을 시작합니다. 진행 상황과 아이템 쌍을 반환합니다.",
+      "method": "GET",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"titleId\": 1,\n  \"categoryId\": 1,\n  \"chooseNum\": 10\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_content_type"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 3000000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_comp_choose",
+      "_type": "request",
+      "parentId": "fld_game_api",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/game/comp/choose",
+      "name": "Comp Choose",
+      "description": "아이템 비교 선택을 저장합니다.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"titleId\": 1,\n  \"categoryId\": 1,\n  \"chosenId\": 10,\n  \"notChosenId\": 20,\n  \"progressionId\": 1,\n  \"item1Id\": 10,\n  \"item2Id\": 20,\n  \"chooseReason\": \"이 아이템이 더 강력합니다\"\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_content_type"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 4000000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "req_balance_choose",
+      "_type": "request",
+      "parentId": "fld_game_api",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "url": "{{ _.base_url }}/api/game/balance/choose",
+      "name": "Balance Choose",
+      "description": "밸런스 선택을 저장하고 선택률과 이유를 반환합니다.",
+      "method": "POST",
+      "body": {
+        "mimeType": "application/json",
+        "text": "{\n  \"titleId\": 1,\n  \"categoryId\": 1,\n  \"chosenId\": 10,\n  \"notChosenId\": 20,\n  \"progressionId\": 1\n}"
+      },
+      "parameters": [],
+      "headers": [
+        {
+          "name": "Content-Type",
+          "value": "application/json",
+          "id": "pair_content_type"
+        }
+      ],
+      "authentication": {},
+      "metaSortKey": 5000000000000,
+      "isPrivate": false,
+      "settingStoreCookies": true,
+      "settingSendCookies": true,
+      "settingDisableRenderRequestBody": false,
+      "settingEncodeUrl": true,
+      "settingRebuildPath": true,
+      "settingFollowRedirects": "global"
+    },
+    {
+      "_id": "fld_game_api",
+      "_type": "request_group",
+      "parentId": "wrk_game_api",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "Game API",
+      "description": "GameController API 엔드포인트",
+      "environment": {},
+      "environmentPropertyOrder": null,
+      "metaSortKey": 1000000000000
+    },
+    {
+      "_id": "env_base",
+      "_type": "environment",
+      "parentId": "wrk_game_api",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "Base Environment",
+      "data": {
+        "base_url": "http://localhost:8080",
+        "title_id": "1"
+      },
+      "dataPropertyOrder": {
+        "&": [
+          "base_url",
+          "title_id"
+        ]
+      },
+      "color": null,
+      "isPrivate": false,
+      "metaSortKey": 1000000000000
+    },
+    {
+      "_id": "env_base_sub",
+      "_type": "environment",
+      "parentId": "env_base",
+      "modified": 1704067200000,
+      "created": 1704067200000,
+      "name": "Development",
+      "data": {},
+      "dataPropertyOrder": {
+        "&": []
+      },
+      "color": "#7d69cb",
+      "isPrivate": false,
+      "metaSortKey": 1000000000000
+    }
+  ]
+}
+
