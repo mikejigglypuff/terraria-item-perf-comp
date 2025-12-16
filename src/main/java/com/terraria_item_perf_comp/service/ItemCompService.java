@@ -15,7 +15,7 @@ import com.terraria_item_perf_comp.repository.ItemCompVoteRepository;
 @Service
 public class ItemCompService {
 
-    private static final int DEFAULT_USER_ID = 0;
+    private static final int DEFAULT_USER_ID = 1;
 
     private final ItemCompSituationRepository itemCompSituationRepository;
     private final ItemCompVoteRepository itemCompVoteRepository;

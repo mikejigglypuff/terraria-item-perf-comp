@@ -9,3 +9,9 @@ VALUES
     ('Pre-mechanical bosses', '1'), ('Post-one mechanical boss', '1'), ('Pre-plantera', '1'),
     ('Pre-golem', '1'), ('Pre-moon lord', '1'), ('Post-moon lord', '1');
 
+INSERT INTO `user_roles`(`role_name`)
+VALUES ('USER'), ('ADMIN');
+
+INSERT INTO `users`(`id`, `role_id`, `nickname`)
+VALUES (0, 1, 'Test User');
+

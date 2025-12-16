@@ -108,7 +108,7 @@ ALTER TABLE `item_comp_votes`
   FOREIGN KEY (`situation_id`) REFERENCES `item_comp_situations`(`id`) ON DELETE CASCADE;
 ALTER TABLE `item_comp_votes`
   ADD CONSTRAINT `fk_item_comp_votes_user`
-  FOREIGN KEY (`user_id`) REFERENCES `item_comp_situations`(`id`) ON DELETE CASCADE;
+  FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE;
 
 ALTER TABLE `comp_iteration_counts`
   ADD CONSTRAINT `fk_comp_iteration_counts_category`
