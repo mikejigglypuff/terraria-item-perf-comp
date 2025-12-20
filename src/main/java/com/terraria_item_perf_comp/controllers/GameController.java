@@ -22,7 +22,9 @@ import com.terraria_item_perf_comp.service.ItemService;
 import com.terraria_item_perf_comp.service.ItemStatService;
 import com.terraria_item_perf_comp.service.ProgressionService;
 import com.terraria_item_perf_comp.service.TitleService;
-
+import com.terraria_item_perf_comp.DTO.responses.VO.ProgressionDto;
+import com.terraria_item_perf_comp.DTO.responses.VO.TitleDto;
+import com.terraria_item_perf_comp.models.Title;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -48,9 +50,17 @@ public class GameController {
 
   @GetMapping("/start")
   public ResponseEntity<GameStartResDto> startGame(@RequestBody GameStartReqDto gameStartReqDto) {
-    int progressionId = progressionService.getRandomIdProgression().getId();
+    Progression selectedProgression = progressionService.getRandomIdProgression();
+    Title title = selectedProgression.getTitle();
+    TitleDto titleDto = new TitleDto(title.getId(), title.getTitle(), title.getImgUrl());
+    ProgressionDto progressionDto = new ProgressionDto(
+        selectedProgression.getId(),
+        selectedProgression.getProgressName(),
+        titleDto,
+        selectedProgression.getImgUrl()
+    );
     return ResponseEntity.ok(new GameStartResDto(
-      "success", new Progression(), itemService.getUnseenItemPairs(gameStartReqDto.titleId(), gameStartReqDto.categoryId(), progressionId)));
+      "success", progressionDto, itemService.getUnseenItemPairs(gameStartReqDto.titleId(), gameStartReqDto.categoryId(), selectedProgression.getId())));
   }
 
   @PostMapping("/comp/choose")

@@ -11,6 +11,7 @@ import com.terraria_item_perf_comp.repository.projections.ItemPair;
 
 @Service
 public class ItemService {
+    private static final int ITEM_PAIR_LEN = 64;
 
     private final ItemRepository itemRepository;
 
@@ -24,7 +25,7 @@ public class ItemService {
             return Collections.emptyList();
         }
 
-        return itemRepository.findUnseenItemPairs(titleId, categoryId, progressionId);
+        return itemRepository.findUnseenItemPairs(titleId, categoryId, progressionId, ITEM_PAIR_LEN);
     }
 }
 
