@@ -10,8 +10,9 @@ VALUES
     ('Pre-golem', '1'), ('Pre-moon lord', '1'), ('Post-moon lord', '1');
 
 INSERT INTO `user_roles`(`role_name`)
-VALUES ('USER'), ('ADMIN');
+VALUES ('USER'), ('ADMIN'), ('GUEST');
 
 INSERT INTO `users`(`id`, `role_id`, `nickname`)
 VALUES (0, 1, 'Test User');
 
+ㅍ

@@ -65,4 +65,7 @@ public class User {
             foreignKey = @ForeignKey(name = "fk_users_role"))
     @OnDelete(action = OnDeleteAction.CASCADE)
     private UserRole role;
+
+    @Column(length = 255)
+    private String ipHash;
 }

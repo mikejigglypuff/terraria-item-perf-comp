@@ -21,6 +21,9 @@ public class Item {
     @Column(columnDefinition = "text")
     private String imgUrl;
 
+    @Column(columnDefinition = "text")
+    private String wikiUrl;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "min_progression_id",
             foreignKey = @ForeignKey(name = "fk_items_min_progression"))

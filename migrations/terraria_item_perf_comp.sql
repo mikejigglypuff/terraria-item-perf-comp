@@ -33,7 +33,8 @@ CREATE TABLE `users` (
 	`created_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
 	`updated_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
 	`deleted_at`	datetime	NULL,
-	`role_id` integer NOT NULL
+	`role_id` integer NOT NULL,
+  `ip_hash` varchar(255) NULL
 );
 
 CREATE TABLE `user_roles` (
@@ -45,6 +46,7 @@ CREATE TABLE `items` (
 	`id`	integer	AUTO_INCREMENT  PRIMARY KEY,
 	`item_name`	varchar(255)	NOT NULL,
 	`img_url`	text	NULL,
+	`wiki_url`	text	NULL,
 	`min_progression_id`	integer	NOT NULL,
 	`category_id`	integer	NOT NULL,
 	`title_id`	integer	NOT NULL
