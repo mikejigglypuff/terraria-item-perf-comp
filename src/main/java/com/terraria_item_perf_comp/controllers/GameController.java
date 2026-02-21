@@ -6,25 +6,26 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.terraria_item_perf_comp.DTO.requests.BalanceChooseReqDto;
 import com.terraria_item_perf_comp.DTO.requests.CompChooseReqDto;
-import com.terraria_item_perf_comp.DTO.requests.GameStartReqDto;
 import com.terraria_item_perf_comp.DTO.responses.BalanceChooseResDto;
 import com.terraria_item_perf_comp.DTO.responses.GameStartResDto;
 import com.terraria_item_perf_comp.DTO.responses.GameTitleResDto;
 import com.terraria_item_perf_comp.DTO.responses.ItemCategoryResDto;
+import com.terraria_item_perf_comp.DTO.responses.VO.ProgressionDto;
+import com.terraria_item_perf_comp.DTO.responses.VO.TitleDto;
 import com.terraria_item_perf_comp.models.Progression;
+import com.terraria_item_perf_comp.models.Title;
 import com.terraria_item_perf_comp.service.ItemCategoryService;
 import com.terraria_item_perf_comp.service.ItemCompService;
 import com.terraria_item_perf_comp.service.ItemService;
 import com.terraria_item_perf_comp.service.ItemStatService;
 import com.terraria_item_perf_comp.service.ProgressionService;
 import com.terraria_item_perf_comp.service.TitleService;
-import com.terraria_item_perf_comp.DTO.responses.VO.ProgressionDto;
-import com.terraria_item_perf_comp.DTO.responses.VO.TitleDto;
-import com.terraria_item_perf_comp.models.Title;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -49,7 +50,7 @@ public class GameController {
   }
 
   @GetMapping("/start")
-  public ResponseEntity<GameStartResDto> startGame(@RequestBody GameStartReqDto gameStartReqDto) {
+  public ResponseEntity<GameStartResDto> startGame(@RequestParam int titleId, @RequestParam int categoryId, @RequestParam int chooseNum) {
     Progression selectedProgression = progressionService.getRandomIdProgression();
     Title title = selectedProgression.getTitle();
     TitleDto titleDto = new TitleDto(title.getId(), title.getTitle(), title.getImgUrl());
@@ -60,7 +61,7 @@ public class GameController {
         selectedProgression.getImgUrl()
     );
     return ResponseEntity.ok(new GameStartResDto(
-      "success", progressionDto, itemService.getUnseenItemPairs(gameStartReqDto.titleId(), gameStartReqDto.categoryId(), selectedProgression.getId())));
+      "success", progressionDto, itemService.getUnseenItemPairs(titleId, categoryId, selectedProgression.getId())));
   }
 
   @PostMapping("/comp/choose")

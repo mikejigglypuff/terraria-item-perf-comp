@@ -1,0 +1,26 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Andy Bold';
+  src: url('./assets/fonts/Andy-Bold.woff2') format('woff2'),
+       url('./assets/fonts/Andy-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+body {
+  @apply font-terraria bg-terraria-dark-blue text-white;
+  margin: 0;
+  padding: 0;
+}
+
+/* 테라리아 스타일의 패널/버튼 공통 스타일 */
+.terraria-panel {
+  @apply bg-terraria-dark-blue border-4 border-terraria-ui-border rounded-lg p-4 shadow-xl;
+}
+
+.terraria-button {
+  @apply bg-terraria-blue hover:bg-blue-700 border-2 border-terraria-ui-border px-4 py-2 rounded transition-colors duration-200;
+}
