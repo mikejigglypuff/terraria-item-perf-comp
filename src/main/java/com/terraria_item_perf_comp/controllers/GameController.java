@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.terraria_item_perf_comp.DTO.requests.BalanceChooseReqDto;
 import com.terraria_item_perf_comp.DTO.requests.CompChooseReqDto;
 import com.terraria_item_perf_comp.DTO.responses.BalanceChooseResDto;
+import com.terraria_item_perf_comp.DTO.responses.CompRecentSelectionsResDto;
 import com.terraria_item_perf_comp.DTO.responses.GameStartResDto;
 import com.terraria_item_perf_comp.DTO.responses.GameTitleResDto;
 import com.terraria_item_perf_comp.DTO.responses.ItemCategoryResDto;
@@ -70,6 +71,24 @@ public class GameController {
       gameCompChooseReqDto.categoryId(), gameCompChooseReqDto.chosenId(), gameCompChooseReqDto.titleId(), gameCompChooseReqDto.progressionId(), 
       gameCompChooseReqDto.notChosenId(), gameCompChooseReqDto.item1Id(), gameCompChooseReqDto.item2Id(), gameCompChooseReqDto.chooseReason());
     return ResponseEntity.ok("success");
+  }
+
+  /**
+   * 동일 (titleId, categoryId)에 대한 comp 투표 중, 다른 사용자들의 최근 선택 기록을 조회합니다.
+   *
+   * @param excludeUserId 요청 사용자 본인을 제외할 때 사용자 ID(게스트 등). 생략 시 모든 사용자 기록을 포함합니다.
+   * @param limit           최대 N건 (1~50, 기본 10)
+   */
+  @GetMapping("/comp/recent-selections")
+  public ResponseEntity<CompRecentSelectionsResDto> getRecentCompSelections(
+      @RequestParam int titleId,
+      @RequestParam int categoryId,
+      @RequestParam(defaultValue = "10") int limit,
+      @RequestParam(required = false) Integer excludeUserId
+  ) {
+    return ResponseEntity.ok(
+        itemCompService.getRecentOtherUserSelections(titleId, categoryId, limit, excludeUserId)
+    );
   }
 
   @PostMapping("/balance/choose")

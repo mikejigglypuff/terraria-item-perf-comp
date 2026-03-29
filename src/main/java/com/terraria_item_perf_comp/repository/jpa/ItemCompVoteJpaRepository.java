@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.terraria_item_perf_comp.models.ItemCompVote;
 import com.terraria_item_perf_comp.repository.ItemCompVoteRepository;
+import com.terraria_item_perf_comp.repository.projections.CompRecentVoteRow;
 
 @Repository
 public interface ItemCompVoteJpaRepository extends CrudRepository<ItemCompVote, Integer>, ItemCompVoteRepository {
@@ -40,7 +41,24 @@ public interface ItemCompVoteJpaRepository extends CrudRepository<ItemCompVote, 
           "ORDER BY created_at DESC LIMIT 5",
           nativeQuery = true)
   List<String> findTop5ReasonsByItemIdOrderByCreatedAtDesc(@Param("itemId") int itemId);
-    
+
+  @Override
+  @Query(value = "SELECT v.chosen_item_id AS chosenItemId, v.choose_reason AS chooseReason, v.created_at AS createdAt, "
+          + "s.progression_id AS progressionId, s.comp_item_1 AS item1Id, s.comp_item_2 AS item2Id "
+          + "FROM item_comp_votes v "
+          + "INNER JOIN item_comp_situations s ON v.situation_id = s.id "
+          + "WHERE s.title_id = :titleId AND s.category_id = :categoryId "
+          + "AND (:excludeUserId IS NULL OR v.user_id <> :excludeUserId) "
+          + "ORDER BY v.created_at DESC "
+          + "LIMIT :limit",
+          nativeQuery = true)
+  List<CompRecentVoteRow> findRecentSelectionsByTitleAndCategoryExcludingUser(
+          @Param("titleId") int titleId,
+          @Param("categoryId") int categoryId,
+          @Param("excludeUserId") Integer excludeUserId,
+          @Param("limit") int limit
+  );
+
 }
 
 
