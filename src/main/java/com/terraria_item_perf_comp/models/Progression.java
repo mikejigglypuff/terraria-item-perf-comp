@@ -13,6 +13,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 public class Progression {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)

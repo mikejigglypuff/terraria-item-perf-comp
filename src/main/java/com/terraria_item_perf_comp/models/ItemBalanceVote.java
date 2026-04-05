@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class ItemBalanceVote {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ColumnDefault("0")
@@ -32,8 +33,14 @@ public class ItemBalanceVote {
     private LocalDateTime updatedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "game_id",
+            foreignKey = @ForeignKey(name = "fk_game_id"))
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private ItemBalanceGame game;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "situation_id",
-            foreignKey = @ForeignKey(name = "fk_item_balance_votes_situations"))
+            foreignKey = @ForeignKey(name = "fk_item_balance_votes_situation"))
     private ItemCompSituation situation;
 
     @ManyToOne(fetch = FetchType.LAZY)

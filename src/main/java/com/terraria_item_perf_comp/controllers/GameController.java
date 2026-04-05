@@ -21,12 +21,15 @@ import com.terraria_item_perf_comp.DTO.responses.VO.TitleDto;
 import com.terraria_item_perf_comp.models.Progression;
 import com.terraria_item_perf_comp.models.Title;
 import com.terraria_item_perf_comp.service.ItemCategoryService;
+import com.terraria_item_perf_comp.service.ItemBalanceGameService;
 import com.terraria_item_perf_comp.service.ItemCompService;
 import com.terraria_item_perf_comp.service.ItemService;
 import com.terraria_item_perf_comp.service.ItemStatService;
 import com.terraria_item_perf_comp.service.ProgressionService;
 import com.terraria_item_perf_comp.service.TitleService;
+import com.terraria_item_perf_comp.web.GuestUserIdResolver;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -37,6 +40,8 @@ public class GameController {
   private final ItemCategoryService itemCategoryService;
   private final ItemService itemService;
   private final ItemCompService itemCompService;
+  private final ItemBalanceGameService itemBalanceGameService;
+  private final GuestUserIdResolver guestUserIdResolver;
   private final ItemStatService itemStatService;
   private final ProgressionService progressionService;
 
@@ -51,7 +56,13 @@ public class GameController {
   }
 
   @GetMapping("/start")
-  public ResponseEntity<GameStartResDto> startGame(@RequestParam int titleId, @RequestParam int categoryId, @RequestParam int chooseNum) {
+  public ResponseEntity<GameStartResDto> startGame(
+      @RequestParam int titleId,
+      @RequestParam int categoryId,
+      @RequestParam int chooseNum,
+      @RequestParam(defaultValue = "false") boolean balance,
+      HttpServletRequest request
+  ) {
     Progression selectedProgression = progressionService.getRandomIdProgression();
     Title title = selectedProgression.getTitle();
     TitleDto titleDto = new TitleDto(title.getId(), title.getTitle(), title.getImgUrl());
@@ -61,8 +72,17 @@ public class GameController {
         titleDto,
         selectedProgression.getImgUrl()
     );
+    Integer balanceGameId = null;
+    if (balance) {
+      int userId = guestUserIdResolver.resolveRequiredUserId(request);
+      balanceGameId = itemBalanceGameService.startBalanceGame(titleId, userId, chooseNum);
+    }
     return ResponseEntity.ok(new GameStartResDto(
-      "success", progressionDto, itemService.getUnseenItemPairs(titleId, categoryId, selectedProgression.getId())));
+        "success",
+        progressionDto,
+        itemService.getUnseenItemPairs(titleId, categoryId, selectedProgression.getId()),
+        balanceGameId
+    ));
   }
 
   @PostMapping("/comp/choose")
@@ -92,15 +112,21 @@ public class GameController {
   }
 
   @PostMapping("/balance/choose")
-  public ResponseEntity<BalanceChooseResDto> balanceChoose(@RequestBody BalanceChooseReqDto gameBalanceChooseReqDto) {
-    BalanceChooseResDto response = itemCompService.processBalanceChoiceAndGetResponse(
-      gameBalanceChooseReqDto.titleId(),
-      gameBalanceChooseReqDto.categoryId(),
-      gameBalanceChooseReqDto.progressionId(),
-      gameBalanceChooseReqDto.chosenId(),
-      gameBalanceChooseReqDto.notChosenId(),
-      gameBalanceChooseReqDto.chosenId(),
-      gameBalanceChooseReqDto.notChosenId()
+  public ResponseEntity<BalanceChooseResDto> balanceChoose(
+      @RequestBody BalanceChooseReqDto gameBalanceChooseReqDto,
+      HttpServletRequest request
+  ) {
+    int userId = guestUserIdResolver.resolveRequiredUserId(request);
+    BalanceChooseResDto response = itemBalanceGameService.processBalanceChoiceAndGetResponse(
+        gameBalanceChooseReqDto.gameId(),
+        userId,
+        gameBalanceChooseReqDto.titleId(),
+        gameBalanceChooseReqDto.categoryId(),
+        gameBalanceChooseReqDto.progressionId(),
+        gameBalanceChooseReqDto.chosenId(),
+        gameBalanceChooseReqDto.notChosenId(),
+        gameBalanceChooseReqDto.item1Id(),
+        gameBalanceChooseReqDto.item2Id()
     );
     return ResponseEntity.ok(response);
   }

@@ -1,17 +1,13 @@
 package com.terraria_item_perf_comp.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.terraria_item_perf_comp.DTO.responses.BalanceChooseResDto;
 import com.terraria_item_perf_comp.DTO.responses.CompRecentSelectionsResDto;
 import com.terraria_item_perf_comp.DTO.responses.VO.CompOtherUserSelectionDto;
-import com.terraria_item_perf_comp.DTO.responses.VO.ItemSelectionRate;
 import com.terraria_item_perf_comp.repository.projections.CompRecentVoteRow;
-import com.terraria_item_perf_comp.repository.ItemBalanceVoteRepository;
 import com.terraria_item_perf_comp.repository.ItemCompSituationRepository;
 import com.terraria_item_perf_comp.repository.ItemCompVoteRepository;
 
@@ -24,16 +20,13 @@ public class ItemCompService {
 
     private final ItemCompSituationRepository itemCompSituationRepository;
     private final ItemCompVoteRepository itemCompVoteRepository;
-    private final ItemBalanceVoteRepository itemBalanceVoteRepository;
 
     public ItemCompService(
             ItemCompSituationRepository itemCompSituationRepository,
-            ItemCompVoteRepository itemCompVoteRepository,
-            ItemBalanceVoteRepository itemBalanceVoteRepository
+            ItemCompVoteRepository itemCompVoteRepository
     ) {
         this.itemCompSituationRepository = itemCompSituationRepository;
         this.itemCompVoteRepository = itemCompVoteRepository;
-        this.itemBalanceVoteRepository = itemBalanceVoteRepository;
     }
 
     public void processCompChoice(
@@ -113,16 +106,19 @@ public class ItemCompService {
         return limit;
     }
 
-    public List<ItemSelectionRate> recordBalanceVoteAndGetRates(
+    /**
+     * comp/밸런스 공통으로 {@code item_comp_situations} 행을 보장하고 해당 id를 반환합니다.
+     */
+    public int ensureCompSituationForPair(
             int titleId,
-            int categoryId,
             int progressionId,
-            int chosenItemId,
-            int notChosenId,
+            int categoryId,
             int item1Id,
-            int item2Id
+            int item2Id,
+            int chosenItemId,
+            int notChosenId
     ) {
-        int situationId = ensureSituationId(
+        return ensureSituationId(
                 titleId,
                 progressionId,
                 categoryId,
@@ -131,68 +127,6 @@ public class ItemCompService {
                 chosenItemId,
                 notChosenId
         );
-
-        itemBalanceVoteRepository.upsertBalanceVote(situationId, DEFAULT_USER_ID, chosenItemId);
-
-        Double chosenRateValue = itemBalanceVoteRepository.findSelectionRate(
-                situationId,
-                DEFAULT_USER_ID,
-                chosenItemId
-        );
-        double chosenRate = clampRate(chosenRateValue);
-        double otherRate = clampRate(1.0 - chosenRate);
-
-        List<ItemSelectionRate> rates = new ArrayList<>(2);
-        rates.add(new ItemSelectionRate(chosenItemId, chosenRate));
-        rates.add(new ItemSelectionRate(notChosenId, otherRate));
-        return rates;
-    }
-
-    public BalanceChooseResDto processBalanceChoiceAndGetResponse(
-            int titleId,
-            int categoryId,
-            int progressionId,
-            int chosenItemId,
-            int notChosenId,
-            int item1Id,
-            int item2Id
-    ) {
-        List<ItemSelectionRate> itemSelectionRates = recordBalanceVoteAndGetRates(
-                titleId,
-                categoryId,
-                progressionId,
-                chosenItemId,
-                notChosenId,
-                item1Id,
-                item2Id
-        );
-
-        // itemSelectionRates에서 첫 번째가 item1, 두 번째가 item2
-        int item1IdFromRates = itemSelectionRates.get(0).itemId();
-        int item2IdFromRates = itemSelectionRates.get(1).itemId();
-
-        List<String> item1Reasons = itemCompVoteRepository.findTop5ReasonsByItemIdOrderByCreatedAtDesc(item1IdFromRates);
-        List<String> item2Reasons = itemCompVoteRepository.findTop5ReasonsByItemIdOrderByCreatedAtDesc(item2IdFromRates);
-
-        return new BalanceChooseResDto(
-                "success",
-                itemSelectionRates,
-                item1Reasons,
-                item2Reasons
-        );
-    }
-
-    private double clampRate(Double value) {
-        if (value == null) {
-            return 0.0;
-        }
-        if (value < 0.0) {
-            return 0.0;
-        }
-        if (value > 1.0) {
-            return 1.0;
-        }
-        return value;
     }
 
     private int ensureSituationId(

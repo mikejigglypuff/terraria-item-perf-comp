@@ -12,6 +12,11 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
+    @ExceptionHandler(BalanceGameException.class)
+    public ResponseEntity<String> handleBalanceGameException(BalanceGameException e) {
+        return ResponseEntity.status(e.getStatus()).body(e.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception e) {
         // 원인(Cause) 로깅

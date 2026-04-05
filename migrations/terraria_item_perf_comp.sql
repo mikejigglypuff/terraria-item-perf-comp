@@ -1,4 +1,4 @@
-﻿CREATE SCHEMA terraria_item_perf_comp;
+CREATE SCHEMA terraria_item_perf_comp;
 
 CREATE TABLE `item_comp_votes` (
 	`id`	integer AUTO_INCREMENT  PRIMARY KEY,
@@ -71,8 +71,10 @@ CREATE TABLE `item_balance_votes` (
 	`created_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
 	`updated_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
 	`situation_id`	integer	NOT NULL,
+  `game_id` integer NOT NULL,
 	`user_id`	integer	NOT NULL,
-	`chosen_item_id`	integer	NOT NULL
+	`chosen_item_id`	integer	NOT NULL,
+  UNIQUE KEY `uq_item_balance_votes_game_situation_user` (`game_id`, `situation_id`, `user_id`)
 );
 
 CREATE TABLE `progressions` (
@@ -103,6 +105,19 @@ CREATE TABLE `user_balance_stats` (
     `user_id`   integer NOT NULL,
     `title_id`  integer NOT NULL,
     `correctness_rate`  DECIMAL(10, 3) NOT NULL DEFAULT 0
+);
+
+create table `item_balance_games` (
+  `id` integer AUTO_INCREMENT  PRIMARY KEY,
+  `title_id`	integer	NOT NULL,
+  `user_id`	integer	NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'ready',
+  `expected_rounds` integer NOT NULL,
+  `completed_at` datetime NULL,
+  `voted_rounds` integer NOT NULL DEFAULT 0,
+  `created_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+	`updated_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `chk_item_balance_games_status` CHECK (`status` IN ('ready', 'active', 'completed', 'abandoned'))
 );
 
 ALTER TABLE `item_comp_votes`
@@ -138,7 +153,9 @@ ALTER TABLE `item_balance_votes`
   ADD CONSTRAINT `fk_item_balance_votes_user`
   FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_item_balance_votes_chosen_item`
-  FOREIGN KEY (`chosen_item_id`) REFERENCES `items`(`id`) ON DELETE CASCADE;
+  FOREIGN KEY (`chosen_item_id`) REFERENCES `items`(`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_game_id` 
+  FOREIGN key (`game_id`) REFERENCES `item_balance_games`(`id`) ON DELETE CASCADE;
 
 ALTER TABLE `progressions`
   ADD CONSTRAINT `fk_progressions_title`
@@ -167,6 +184,13 @@ ALTER TABLE `user_balance_stats`
   FOREIGN KEY (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_user_balance_stats_title`
   FOREIGN KEY (`title_id`) REFERENCES `titles`(`id`) ON DELETE CASCADE;
+
+ALTER TABLE `item_balance_games`
+  ADD CONSTRAINT `fk_item_balance_games_user`
+  FOREIGN key (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_item_balance_games_title`
+  FOREIGN KEY (`title_id`) REFERENCES `titles`(`id`) ON DELETE CASCADE;
+
 
 ALTER TABLE `item_comp_stats` ADD CONSTRAINT `PK_ITEM_COMP_STATS` PRIMARY KEY (
 	`situation_id`,

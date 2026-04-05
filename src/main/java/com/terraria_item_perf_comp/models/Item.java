@@ -13,6 +13,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 public class Item {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)

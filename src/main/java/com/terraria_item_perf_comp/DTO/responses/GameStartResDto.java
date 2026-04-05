@@ -8,6 +8,7 @@ import java.util.List;
 public record GameStartResDto(
         String message,
         ProgressionDto progressionDto,
-        List<ItemPair> itemPair
+        List<ItemPair> itemPair,
+        Integer balanceGameId
 ) {
 }

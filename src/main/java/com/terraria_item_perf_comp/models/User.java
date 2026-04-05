@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 @Builder
 public class User {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     private String email;
