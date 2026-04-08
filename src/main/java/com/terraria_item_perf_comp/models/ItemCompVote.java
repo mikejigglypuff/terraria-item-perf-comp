@@ -20,6 +20,7 @@ import java.time.LocalDateTime;
 @EntityListeners(AuditingEntityListener.class)
 public class ItemCompVote {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ColumnDefault("0")

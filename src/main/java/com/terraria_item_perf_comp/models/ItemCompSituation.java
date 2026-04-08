@@ -24,6 +24,7 @@ import org.hibernate.annotations.OnDeleteAction;
 public class ItemCompSituation {
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -42,8 +42,8 @@ src/main/resources/application-dev.yml
 src/main/resources/application-prod.yml
 
 ### Vue.js ###
+node_modules/
 /src/main/js/moz-todo-vue/.DS_Store
-/src/main/js/moz-todo-vue/node_modules
 
 # local env files
 /src/main/js/moz-todo-vue/.env.local

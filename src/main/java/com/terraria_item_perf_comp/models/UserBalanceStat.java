@@ -17,6 +17,7 @@ import java.math.BigDecimal;
 public class UserBalanceStat {
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)

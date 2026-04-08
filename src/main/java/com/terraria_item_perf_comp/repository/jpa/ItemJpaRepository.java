@@ -40,12 +40,14 @@ public interface ItemJpaRepository extends JpaRepository<Item, Integer>, ItemRep
             " AND s.comp_item_min  = c.pair_min\n" +
             " AND s.comp_item_max  = c.pair_max\n" +
             "WHERE s.id IS NULL\n" +
-            "ORDER BY RAND()",
+            "ORDER BY RAND()\n" +
+            "LIMIT :length",
             nativeQuery = true)
     List<ItemPair> findUnseenItemPairs(
             @Param("titleId") int titleId,
             @Param("categoryId") int categoryId,
-            @Param("progressionId") int progressionId
+            @Param("progressionId") int progressionId,
+            @Param("length") int length
     );
 }
 

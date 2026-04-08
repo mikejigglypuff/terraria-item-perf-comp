@@ -13,6 +13,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 public class Item {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @Column(nullable = false)
@@ -20,6 +21,9 @@ public class Item {
 
     @Column(columnDefinition = "text")
     private String imgUrl;
+
+    @Column(columnDefinition = "text")
+    private String wikiUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "min_progression_id",

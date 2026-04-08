@@ -9,13 +9,13 @@ public interface ItemBalanceVoteRepository {
      * @param chosenItemId 선택된 아이템 ID
      * @return 영향받은 행 수
      */
-    int upsertBalanceVote(int situationId, int userId, int chosenItemId);
+    int upsertBalanceVote(int situationId, int gameId, int userId, int chosenItemId);
 
     /**
      * 특정 상황/사용자/아이템 조합의 선택률을 반환합니다.
      *
      * @return 선택률 (0~1), 데이터가 없으면 null
      */
-    Double findSelectionRate(int situationId, int userId, int chosenItemId);
+    Double findSelectionRate(int situationId, int gameId, int userId, int chosenItemId);
 }
 

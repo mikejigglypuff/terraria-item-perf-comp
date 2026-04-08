@@ -14,6 +14,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Builder
 public class CompIterationCount {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,55 +1,160 @@
 package com.terraria_item_perf_comp.controllers;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.http.ResponseEntity;
-import com.terraria_item_perf_comp.DTO.responses.GameTitleResDto;
-import com.terraria_item_perf_comp.models.Title;
-import com.terraria_item_perf_comp.DTO.responses.ItemCategoryResDto;
-import com.terraria_item_perf_comp.DTO.responses.GameStartResDto;
-import com.terraria_item_perf_comp.models.Progression;
-import com.terraria_item_perf_comp.models.Item;
-import com.terraria_item_perf_comp.DTO.requests.GameStartReqDto;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import com.terraria_item_perf_comp.models.ItemCategory;
-import com.terraria_item_perf_comp.DTO.requests.CompChooseReqDto;
-import com.terraria_item_perf_comp.DTO.requests.BalanceChooseReqDto;
-import com.terraria_item_perf_comp.DTO.responses.BalanceChooseResDto;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.terraria_item_perf_comp.DTO.requests.BalanceChooseReqDto;
+import com.terraria_item_perf_comp.DTO.requests.CompChooseReqDto;
+import com.terraria_item_perf_comp.DTO.responses.BalanceChooseResDto;
+import com.terraria_item_perf_comp.DTO.responses.CompRecentSelectionsResDto;
+import com.terraria_item_perf_comp.DTO.responses.GameStartResDto;
+import com.terraria_item_perf_comp.DTO.responses.GameTitleResDto;
+import com.terraria_item_perf_comp.DTO.responses.ItemCategoryResDto;
+import com.terraria_item_perf_comp.DTO.responses.VO.ProgressionDto;
+import com.terraria_item_perf_comp.DTO.responses.VO.TitleDto;
+import com.terraria_item_perf_comp.models.Progression;
+import com.terraria_item_perf_comp.models.Title;
+import com.terraria_item_perf_comp.service.ItemCategoryService;
+import com.terraria_item_perf_comp.service.ItemBalanceGameService;
+import com.terraria_item_perf_comp.service.ItemCompGameService;
+import com.terraria_item_perf_comp.service.ItemCompService;
+import com.terraria_item_perf_comp.service.ItemService;
+import com.terraria_item_perf_comp.service.ItemStatService;
+import com.terraria_item_perf_comp.service.ProgressionService;
+import com.terraria_item_perf_comp.service.TitleService;
+import com.terraria_item_perf_comp.web.GuestUserIdResolver;
+
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/game")
+@RequiredArgsConstructor
 public class GameController {
+  private final TitleService titleService;
+  private final ItemCategoryService itemCategoryService;
+  private final ItemService itemService;
+  private final ItemCompService itemCompService;
+  private final ItemBalanceGameService itemBalanceGameService;
+  private final ItemCompGameService itemCompGameService;
+  private final GuestUserIdResolver guestUserIdResolver;
+  private final ItemStatService itemStatService;
+  private final ProgressionService progressionService;
+
   @GetMapping("/titles")
   public ResponseEntity<GameTitleResDto> getGameTitles() {
-    // TODO: Implement get game titles logic
-    return ResponseEntity.ok(new GameTitleResDto("success", new Title[0]));
+    return ResponseEntity.ok(new GameTitleResDto("success", titleService.getAllTitles()));
   }
 
-  @GetMapping("/titles/${titleId}/categories")
+  @GetMapping("/titles/{titleId}/categories")
   public ResponseEntity<ItemCategoryResDto> getGameCategories(@PathVariable int titleId) {
-    // TODO: Implement get game categories logic
-    return ResponseEntity.ok(new ItemCategoryResDto("success", new ItemCategory[0]));
+    return ResponseEntity.ok(new ItemCategoryResDto("success", itemCategoryService.getItemCategoriesByTitleId(titleId)));
   }
 
   @GetMapping("/start")
-  public ResponseEntity<GameStartResDto> startGame(@RequestBody GameStartReqDto gameStartReqDto) {
-    // TODO: Implement start game logic
+  public ResponseEntity<GameStartResDto> startGame(
+      @RequestParam int titleId,
+      @RequestParam int categoryId,
+      @RequestParam int chooseNum,
+      @RequestParam(defaultValue = "false") boolean balance,
+      @RequestParam(defaultValue = "false") boolean comp,
+      HttpServletRequest request
+  ) {
+    Progression selectedProgression = progressionService.getRandomIdProgression();
+    Title title = selectedProgression.getTitle();
+    TitleDto titleDto = new TitleDto(title.getId(), title.getTitle(), title.getImgUrl());
+    ProgressionDto progressionDto = new ProgressionDto(
+        selectedProgression.getId(),
+        selectedProgression.getProgressName(),
+        titleDto,
+        selectedProgression.getImgUrl()
+    );
+    if (balance == comp) {
+      // both true or both false
+      throw new com.terraria_item_perf_comp.exception.GameException(
+          org.springframework.http.HttpStatus.BAD_REQUEST,
+          "Invalid game type. Set exactly one of balance or comp."
+      );
+    }
+
+    int userId = guestUserIdResolver.resolveRequiredUserId(request);
+    Integer balanceGameId = null;
+    Integer compGameId = null;
+    if (balance) {
+      balanceGameId = itemBalanceGameService.startBalanceGame(titleId, userId, chooseNum);
+    } else {
+      compGameId = itemCompGameService.startCompGame(titleId, userId, chooseNum, categoryId);
+    }
     return ResponseEntity.ok(new GameStartResDto(
-      "success", new Progression(), new Item(), new Item()));
+        "success",
+        progressionDto,
+        itemService.getUnseenItemPairs(titleId, categoryId, selectedProgression.getId()),
+        balanceGameId,
+        compGameId
+    ));
   }
 
   @PostMapping("/comp/choose")
-  public ResponseEntity<String> compChoose(@RequestBody CompChooseReqDto gameCompChooseReqDto) {
-    // TODO: Implement comp choose logic
+  public ResponseEntity<String> compChoose(
+      @RequestBody CompChooseReqDto gameCompChooseReqDto,
+      HttpServletRequest request
+  ) {
+    int userId = guestUserIdResolver.resolveRequiredUserId(request);
+    itemCompGameService.recordCompChoice(
+        userId,
+        gameCompChooseReqDto.titleId(),
+        gameCompChooseReqDto.categoryId(),
+        gameCompChooseReqDto.progressionId(),
+        gameCompChooseReqDto.chosenId(),
+        gameCompChooseReqDto.notChosenId(),
+        gameCompChooseReqDto.item1Id(),
+        gameCompChooseReqDto.item2Id(),
+        gameCompChooseReqDto.chooseReason()
+    );
     return ResponseEntity.ok("success");
   }
 
+  /**
+   * 동일 (titleId, categoryId)에 대한 comp 투표 중, 다른 사용자들의 최근 선택 기록을 조회합니다.
+   *
+   * @param excludeUserId 요청 사용자 본인을 제외할 때 사용자 ID(게스트 등). 생략 시 모든 사용자 기록을 포함합니다.
+   * @param limit           최대 N건 (1~50, 기본 10)
+   */
+  @GetMapping("/comp/recent-selections")
+  public ResponseEntity<CompRecentSelectionsResDto> getRecentCompSelections(
+      @RequestParam int titleId,
+      @RequestParam int categoryId,
+      @RequestParam(defaultValue = "10") int limit,
+      @RequestParam(required = false) Integer excludeUserId
+  ) {
+    return ResponseEntity.ok(
+        itemCompService.getRecentOtherUserSelections(titleId, categoryId, limit, excludeUserId)
+    );
+  }
+
   @PostMapping("/balance/choose")
-  public ResponseEntity<BalanceChooseResDto> balanceChoose(@RequestBody BalanceChooseReqDto gameBalanceChooseReqDto) {
-    // TODO: Implement balance choose logic
-    return ResponseEntity.ok(new BalanceChooseResDto("success", 0, 0, new String[0], new String[0]));
+  public ResponseEntity<BalanceChooseResDto> balanceChoose(
+      @RequestBody BalanceChooseReqDto gameBalanceChooseReqDto,
+      HttpServletRequest request
+  ) {
+    int userId = guestUserIdResolver.resolveRequiredUserId(request);
+    BalanceChooseResDto response = itemBalanceGameService.processBalanceChoiceAndGetResponse(
+        gameBalanceChooseReqDto.gameId(),
+        userId,
+        gameBalanceChooseReqDto.titleId(),
+        gameBalanceChooseReqDto.categoryId(),
+        gameBalanceChooseReqDto.progressionId(),
+        gameBalanceChooseReqDto.chosenId(),
+        gameBalanceChooseReqDto.notChosenId(),
+        gameBalanceChooseReqDto.item1Id(),
+        gameBalanceChooseReqDto.item2Id()
+    );
+    return ResponseEntity.ok(response);
   }
 }
