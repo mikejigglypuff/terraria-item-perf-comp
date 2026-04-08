@@ -120,6 +120,20 @@ create table `item_balance_games` (
   CONSTRAINT `chk_item_balance_games_status` CHECK (`status` IN ('ready', 'active', 'completed', 'abandoned'))
 );
 
+create table `item_comp_games` (
+  `id` integer AUTO_INCREMENT  PRIMARY KEY,
+  `title_id`	integer	NOT NULL,
+  `user_id`	integer	NOT NULL,
+  `category_id` integer NOT NULL,
+  `status` varchar(16) NOT NULL DEFAULT 'ready',
+  `expected_rounds` integer NOT NULL,
+  `completed_at` datetime NULL,
+  `voted_rounds` integer NOT NULL DEFAULT 0,
+  `created_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+	`updated_at`	datetime	NOT NULL    DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT `chk_item_comp_games_status` CHECK (`status` IN ('ready', 'active', 'completed', 'abandoned'))
+);
+
 ALTER TABLE `item_comp_votes`
   ADD CONSTRAINT `fk_item_comp_votes_situation`
   FOREIGN KEY (`situation_id`) REFERENCES `item_comp_situations`(`id`) ON DELETE CASCADE;
@@ -190,6 +204,14 @@ ALTER TABLE `item_balance_games`
   FOREIGN key (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
   ADD CONSTRAINT `fk_item_balance_games_title`
   FOREIGN KEY (`title_id`) REFERENCES `titles`(`id`) ON DELETE CASCADE;
+
+ALTER TABLE `item_comp_games`
+  ADD CONSTRAINT `fk_item_comp_games_user`
+  FOREIGN key (`user_id`) REFERENCES `users`(`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_item_comp_games_title`
+  FOREIGN KEY (`title_id`) REFERENCES `titles`(`id`) ON DELETE CASCADE,
+  ADD CONSTRAINT `fk_item_comp_games_category`
+  FOREIGN KEY (`category_id`) REFERENCES `item_category`(`id`) ON DELETE CASCADE;
 
 
 ALTER TABLE `item_comp_stats` ADD CONSTRAINT `PK_ITEM_COMP_STATS` PRIMARY KEY (

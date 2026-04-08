@@ -12,8 +12,8 @@ public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(BalanceGameException.class)
-    public ResponseEntity<String> handleBalanceGameException(BalanceGameException e) {
+    @ExceptionHandler(GameException.class)
+    public ResponseEntity<String> handleGameException(GameException e) {
         return ResponseEntity.status(e.getStatus()).body(e.getMessage());
     }
 

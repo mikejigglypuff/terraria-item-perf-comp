@@ -9,6 +9,7 @@ public record GameStartResDto(
         String message,
         ProgressionDto progressionDto,
         List<ItemPair> itemPair,
-        Integer balanceGameId
+        Integer balanceGameId,
+        Integer compGameId
 ) {
 }

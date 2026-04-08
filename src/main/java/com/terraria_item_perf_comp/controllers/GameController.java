@@ -22,6 +22,7 @@ import com.terraria_item_perf_comp.models.Progression;
 import com.terraria_item_perf_comp.models.Title;
 import com.terraria_item_perf_comp.service.ItemCategoryService;
 import com.terraria_item_perf_comp.service.ItemBalanceGameService;
+import com.terraria_item_perf_comp.service.ItemCompGameService;
 import com.terraria_item_perf_comp.service.ItemCompService;
 import com.terraria_item_perf_comp.service.ItemService;
 import com.terraria_item_perf_comp.service.ItemStatService;
@@ -41,6 +42,7 @@ public class GameController {
   private final ItemService itemService;
   private final ItemCompService itemCompService;
   private final ItemBalanceGameService itemBalanceGameService;
+  private final ItemCompGameService itemCompGameService;
   private final GuestUserIdResolver guestUserIdResolver;
   private final ItemStatService itemStatService;
   private final ProgressionService progressionService;
@@ -61,6 +63,7 @@ public class GameController {
       @RequestParam int categoryId,
       @RequestParam int chooseNum,
       @RequestParam(defaultValue = "false") boolean balance,
+      @RequestParam(defaultValue = "false") boolean comp,
       HttpServletRequest request
   ) {
     Progression selectedProgression = progressionService.getRandomIdProgression();
@@ -72,24 +75,48 @@ public class GameController {
         titleDto,
         selectedProgression.getImgUrl()
     );
+    if (balance == comp) {
+      // both true or both false
+      throw new com.terraria_item_perf_comp.exception.GameException(
+          org.springframework.http.HttpStatus.BAD_REQUEST,
+          "Invalid game type. Set exactly one of balance or comp."
+      );
+    }
+
+    int userId = guestUserIdResolver.resolveRequiredUserId(request);
     Integer balanceGameId = null;
+    Integer compGameId = null;
     if (balance) {
-      int userId = guestUserIdResolver.resolveRequiredUserId(request);
       balanceGameId = itemBalanceGameService.startBalanceGame(titleId, userId, chooseNum);
+    } else {
+      compGameId = itemCompGameService.startCompGame(titleId, userId, chooseNum, categoryId);
     }
     return ResponseEntity.ok(new GameStartResDto(
         "success",
         progressionDto,
         itemService.getUnseenItemPairs(titleId, categoryId, selectedProgression.getId()),
-        balanceGameId
+        balanceGameId,
+        compGameId
     ));
   }
 
   @PostMapping("/comp/choose")
-  public ResponseEntity<String> compChoose(@RequestBody CompChooseReqDto gameCompChooseReqDto) {
-    itemCompService.processCompChoice(
-      gameCompChooseReqDto.categoryId(), gameCompChooseReqDto.chosenId(), gameCompChooseReqDto.titleId(), gameCompChooseReqDto.progressionId(), 
-      gameCompChooseReqDto.notChosenId(), gameCompChooseReqDto.item1Id(), gameCompChooseReqDto.item2Id(), gameCompChooseReqDto.chooseReason());
+  public ResponseEntity<String> compChoose(
+      @RequestBody CompChooseReqDto gameCompChooseReqDto,
+      HttpServletRequest request
+  ) {
+    int userId = guestUserIdResolver.resolveRequiredUserId(request);
+    itemCompGameService.recordCompChoice(
+        userId,
+        gameCompChooseReqDto.titleId(),
+        gameCompChooseReqDto.categoryId(),
+        gameCompChooseReqDto.progressionId(),
+        gameCompChooseReqDto.chosenId(),
+        gameCompChooseReqDto.notChosenId(),
+        gameCompChooseReqDto.item1Id(),
+        gameCompChooseReqDto.item2Id(),
+        gameCompChooseReqDto.chooseReason()
+    );
     return ResponseEntity.ok("success");
   }
 
